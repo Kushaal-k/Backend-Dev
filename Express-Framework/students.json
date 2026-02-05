@@ -1,7 +1,17 @@
 [
-    {
-        "id": "2",
-        "name": "Vishal",
-        "branch": "EE"
-    }
+  {
+    "id": 2,
+    "name": "Ayush",
+    "branch": "EE"
+  },
+  {
+    "id": 3,
+    "name": "Naman",
+    "branch": "IT"
+  },
+  {
+    "id": 4,
+    "name": "Kushaal",
+    "branch": "CSE"
+  }
 ]
