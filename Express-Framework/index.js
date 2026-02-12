@@ -9,6 +9,10 @@ app.get("/", (req, res) => {
     res.status(200).send("Welcome to the home page.")
 })
 
+
+
+
+
 app.get("/students", (req, res) => {
     const branch = req.query.branch;
 
