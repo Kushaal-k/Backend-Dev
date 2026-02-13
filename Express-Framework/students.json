@@ -13,5 +13,15 @@
     "id": 5,
     "name": "Kushaal",
     "branch": "CSE"
+  },
+  {
+    "id": 6,
+    "name": "Kushaal",
+    "branch": "CSE"
+  },
+  {
+    "id": 7,
+    "name": "Testuser",
+    "branch": "IT"
   }
 ]
