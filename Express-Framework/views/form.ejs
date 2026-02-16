@@ -19,13 +19,16 @@
         <button type="submit">Register</button>
     </form>
 
-    <h3>Current Students</h3>
+    <h3>Current Students (<%= allStudents.length %>)</h3>
     <ul>
-        <% allStudents.length === 0 ? %>
-            <p>No students registered</p>
-        <% allStudents.forEach(s => { %>
+        <% if(allStudents.length === 0) {%>
+            <li>No students registered yet.</li>
+        <% } 
+        else { %>
+            <% allStudents.forEach(s => { %>
             <li><%=s.name %> - <%= s.branch %></li>
         <% }) %>
+        <% } %>
     </ul>
 </body>
 </html>
