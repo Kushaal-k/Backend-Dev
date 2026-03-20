@@ -23,5 +23,15 @@
     "id": 7,
     "name": "Testuser",
     "branch": "IT"
+  },
+  {
+    "id": 8,
+    "name": "Student1",
+    "branch": "CSE-IT"
+  },
+  {
+    "id": 9,
+    "name": "Student12",
+    "branch": "CSE-IT"
   }
 ]
