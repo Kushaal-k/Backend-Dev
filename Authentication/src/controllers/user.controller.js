@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 
 const sendEmail = (email, link) => {
@@ -18,7 +19,7 @@ const register = async (req, res) => {
         const user = await User.findOne({email});
 
         if(user) {
-            res.status(401).json({message: "Email is already registerd!!"})
+            return res.status(401).json({message: "Email is already registerd!!"})
         }
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -79,7 +80,7 @@ const login = async (req, res) => {
             return res.status(400).json({message: "Please verify your email first!"})
         }
 
-        const isMatched = bcrypt.compare(password, user.password);
+        const isMatched = await bcrypt.compare(password, user.password);
         if(!isMatched) {
             return res.status(400).json({message: "Invalid Credentials"})
         }
@@ -90,11 +91,74 @@ const login = async (req, res) => {
             {expiresIn: "1d"}
         ) 
 
-        res.status(200).json({message: "Login successful", token})
+        res.status(200).json({message: "Login successful", token, user})
     } 
     catch (error) {
         res.status(500).json({"message" : "Internal Server Error"});
     }
 }
 
-export {register, verifyEmail, login}
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    if(!email) {
+        return res.status(400).json({message: "Email is required!!"})
+    }
+
+    try {
+        const user = await User.findOne({email})
+
+        if(!user) {
+            return res.status(404).json({message: "User does not exist"})
+        }
+
+        const token = crypto.randomBytes(32).toString("hex");
+        user.resetToken = token;
+        user.resetTokenExpiry = new Date(Date.now() + 3600000);
+
+        await user.save();
+
+        const link = `http://localhost:8000/auth/reset-password?token=${token}`;
+        sendEmail(email, link);
+
+        res.status(200).json({message: "Password reset link sent to your email"})
+
+    } 
+    catch (error) {
+        res.status(500).json({"message" : "Internal Server Error"});
+    }
+}
+
+const resetPassword = async (req, res) => { 
+    const { newPassword } = req.body;
+    const token = req.query.token;
+
+    if(!newPassword || !token) {
+        return res.status(400).json({message: "All fields are required!!"})
+    }
+
+    try {
+        const user = await User.findOne({ 
+            resetToken: token,
+            resetTokenExpiry: { $gt: Date.now() } 
+        });
+
+        if(!user) {
+            return res.status(400).json({message: "Invalid or expired token"})
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.resetToken = null;
+        user.resetTokenExpiry = null;
+
+        await user.save();
+
+        res.status(200).json({message: "Password reset successful"})
+
+    } catch (error) {
+        res.status(500).json({"message" : "Internal Server Error"});
+    }
+}
+
+
+export {register, verifyEmail, login, forgotPassword, resetPassword}
